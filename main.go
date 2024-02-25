@@ -1,21 +1,27 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
+	"gohub/bootstrap"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	//new一个Gin Engine实例
-	r := gin.New()
 
-	//注册路由中间件
+	// new 一个 Gin Engine 实例
+	r := gin.New()
+	router := gin.New()
+
+	// 注册中间件
 	r.Use(gin.Logger(), gin.Recovery())
 
-	//注册路由
+	// 注册一个路由
 	r.GET("/", func(c *gin.Context) {
-		//以json格式响应
+
+		// 以 JSON 格式响应
 		c.JSON(http.StatusOK, gin.H{
 			"Hello": "World!",
 		})
@@ -36,7 +42,14 @@ func main() {
 			})
 		}
 	})
+	// 初始化路由绑定
+	bootstrap.SetupRoute(router)
 
-	//运行服务,默认为8080，指定为8000
+	// 运行服务
 	r.Run(":8000")
+	err := router.Run(":3000")
+	if err != nil {
+		// 错误处理，端口被占用了或者其他错误
+		fmt.Println(err.Error())
+	}
 }
